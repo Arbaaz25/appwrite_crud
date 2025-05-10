@@ -28,6 +28,10 @@ jobs:
   # Build job
   build:
     runs-on: ubuntu-latest
+    env:
+      APPWRITE_ENDPOINT: ${{ secrets.APPWRITE_ENDPOINT }}
+      APPWRITE_PROJECT_ID: ${{ secrets.APPWRITE_PROJECT_ID }}
+      APPWRITE_DATABASE_ID: ${{ secrets.APPWRITE_DATABASE_ID }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -79,7 +83,9 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./out
-
+          
+  
+      
   # Deployment job
   deploy:
     environment:
