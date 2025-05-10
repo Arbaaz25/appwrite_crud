@@ -29,9 +29,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      APPWRITE_ENDPOINT: ${{ secrets.NEXT_PUBLIC_APPWRITE_ENDPOINT }}
-      APPWRITE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_APPWRITE_PROJECT_ID }}
-      APPWRITE_DATABASE_ID: ${{ secrets.NEXT_PUBLIC_APPWRITE_DATABASE_ID }}
+      NEXT_PUBLIC_APPWRITE_ENDPOINT: ${{ secrets.NEXT_PUBLIC_APPWRITE_ENDPOINT }}
+      NEXT_PUBLIC_APPWRITE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_APPWRITE_PROJECT_ID }}
+      NEXT_PUBLIC_APPWRITE_DATABASE_ID: ${{ secrets.NEXT_PUBLIC_APPWRITE_DATABASE_ID }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
