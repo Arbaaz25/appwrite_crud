@@ -1,107 +1,94 @@
+import { NextResponse } from "next/server";
 import client from "@/lib/appwrite_client";
 import { Databases } from "appwrite";
-import { NextResponse } from "next/server";
 
 const database = new Databases(client);
 
-//Fetch a single interpretation
-async function FetchInterpretation(id: string) {
+const DB_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID as string;
+const COLLECTION_ID = "Interpretations";
+
+// Helper: Fetch a single interpretation
+async function fetchInterpretation(id: string) {
   try {
-    const interpretation = await database.getDocument(
-      process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID as string,
-      "Interpretations",
-      id
-    );
-    return interpretation;
+    return await database.getDocument(DB_ID, COLLECTION_ID, id);
   } catch (error) {
-    console.log("Error fetching interpretation:", error);
+    console.error("Error fetching interpretation:", error);
     throw new Error("Failed to fetch interpretation");
   }
 }
 
-//Delete a single interpretation
+// Helper: Delete a single interpretation
 async function deleteInterpretation(id: string) {
   try {
-    const response = await database.deleteDocument(
-      process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID as string,
-      "Interpretations",
-      id
-    );
-    return response;
+    return await database.deleteDocument(DB_ID, COLLECTION_ID, id);
   } catch (error) {
-    console.log("Error deleting interpretation:", error);
+    console.error("Error deleting interpretation:", error);
     throw new Error("Failed to delete interpretation");
   }
 }
 
-//Update a single interpretation
+// Helper: Update a single interpretation
 async function updateInterpretation(
   id: string,
   data: { term: string; interpretation: string }
 ) {
   try {
-    const response = await database.updateDocument(
-      process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID as string,
-      "Interpretations",
-      id,
-      data
-    );
-    return response;
+    return await database.updateDocument(DB_ID, COLLECTION_ID, id, data);
   } catch (error) {
-    console.log("Error updating interpretation:", error);
+    console.error("Error updating interpretation:", error);
     throw new Error("Failed to update interpretation");
   }
 }
 
-export async function GET(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
-  try {
-    const id = params.id;
-    const interpretation = await FetchInterpretation(id);
-    return NextResponse.json(interpretation);
-  } catch (error) {
-    return NextResponse.json(
-      { message: "Failed to fetch interpretation" },
-      { status: 500 }
-    );
+// GET /api/interpretations/[id]
+export async function GET(req: Request, context: { params: Promise<{ id: string }> }) {
+    const { id } = await context.params;
+  
+    try {
+      const interpretation = await fetchInterpretation(id);
+      return NextResponse.json(interpretation);
+    } catch (error) {
+        console.error("Error fetching interpretation:", error);
+      return NextResponse.json(
+        { message: "Failed to fetch interpretation" },
+        { status: 500 }
+      );
+    }
   }
-}
+  
 
-export async function DELETE(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
-  try {
-    const id = params.id;
-    const response = await deleteInterpretation(id);
-    return NextResponse.json({
-      message: "Interpretation deleted successfully",
-    });
-  } catch (error) {
-    return NextResponse.json(
-      { message: "Failed to delete interpretation" },
-      { status: 500 }
-    );
-  }
-}
-export async function PUT(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
-  try {
-    const id = params.id;
+// PUT /api/interpretations/[id]
+export async function PUT(req: Request, context: { params: Promise<{ id: string }> }) {
+    const { id } = await context.params;
     const { term, interpretation } = await req.json();
-    const data = { term, interpretation };
-    const response = await updateInterpretation(id, data);
-    return NextResponse.json({
-      message: "Interpretation updated successfully",
-    });
-  } catch (error) {
-    return NextResponse.json(
-      { message: "Failed to update interpretation" },
-      { status: 500 }
-    );
+  
+    try {
+      const updated = await updateInterpretation(id, { term, interpretation });
+      return NextResponse.json({
+        message: "Interpretation updated successfully",
+        data: updated,
+      });
+    } catch (error) {
+        console.error("Error updating interpretation:", error);
+      return NextResponse.json(
+        { message: "Failed to update interpretation" },
+        { status: 500 }
+      );
+    }
   }
-}
+  
+  export async function DELETE(req: Request, context: { params: Promise<{ id: string }> }) {
+    const { id } = await context.params;
+  
+    try {
+      await deleteInterpretation(id);
+      return NextResponse.json({ message: "Interpretation deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting interpretation:", error);
+      return NextResponse.json(
+        { message: "Failed to delete interpretation" },
+        { status: 500 }
+      );
+    }
+  }
+  

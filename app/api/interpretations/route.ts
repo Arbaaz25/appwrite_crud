@@ -40,11 +40,12 @@ export async function POST(req: Request) {
   try {
     const { term, interpretation } = await req.json();
     const data = { term, interpretation };
-    const response = await createInterpretation(data);
+    await createInterpretation(data);
     return NextResponse.json({
       message: "Interpretation created successfully",
     });
   } catch (error) {
+    console.log("Error creating interpretation:", error);
     return NextResponse.json(
       { message: "Failed to create interpretation" },
       { status: 500 }
@@ -57,6 +58,7 @@ export async function GET() {
     const interpretations = await FetchInterpretations();
     return NextResponse.json(interpretations);
   } catch (error) {
+    console.log("Error fetching interpretations:", error);
     return NextResponse.json(
       { message: "Failed to fetch interpretations" },
       { status: 500 }

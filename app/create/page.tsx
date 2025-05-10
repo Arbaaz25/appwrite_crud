@@ -42,7 +42,7 @@ export default function CreatePage() {
         throw new Error("Failed to add interpretation");
       }
 
-      const data = await response.json();
+       await response.json();
       setFormData({ term: "", interpretation: "" });
         router.push("/");
 
